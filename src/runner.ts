@@ -1,4 +1,6 @@
-import { Worker, isMainThread } from "worker_threads";
+import { Worker, isMainThread, workerData } from "worker_threads";
+import { Suite } from "./index";
+import path from "path";
 
 if (isMainThread) {
   const testFilePaths = process.argv.slice(2);
@@ -19,4 +21,7 @@ if (isMainThread) {
     });
   });
 } else {
+  const suite: Suite = require(path.join(process.cwd(), workerData));
+
+  console.log(suite.tests);
 }
