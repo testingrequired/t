@@ -1,0 +1,29 @@
+{
+  "name": "@testingrequired/t",
+  "version": "0.0.0",
+  "description": "A minimal test framework",
+  "main": "index.js",
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "npm run type-check -- --watch",
+    "build": "npm run build:types && npm run build:js",
+    "build:types": "tsc --emitDeclarationOnly",
+    "build:js": "babel src --out-dir lib --extensions \".ts,.tsx\" --source-maps inline",
+    "prepublishOnly": "npm run verify && npm run build",
+    "pack-preview": "npm pack && tar -xvzf *.tgz && rm -rf package *.tgz",
+    "test": "",
+    "verify": "npm run test && npm run cli"
+  },
+  "keywords": [],
+  "author": "Kylee Tilley <kylee@testingrequired.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.8.4",
+    "@babel/plugin-transform-runtime": "^7.8.3",
+    "@babel/preset-env": "^7.8.4",
+    "@babel/preset-typescript": "^7.8.3",
+    "@types/node": "^13.7.1",
+    "typescript": "^3.8.0-beta"
+  }
+}
