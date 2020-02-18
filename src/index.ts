@@ -2,7 +2,7 @@ import TestFunction from "./TestFunction";
 import TestOptions from "./TestOptions";
 
 export class Suite {
-  public tests: [string, TestFunction, TestOptions?][];
+  public tests: [string, TestFunction?, TestOptions?][];
   public beforeAlls: Array<() => void>;
   public beforeEachs: Array<() => void>;
   public afterEachs: Array<() => void>;
@@ -44,7 +44,7 @@ export class Suite {
     return this;
   }
 
-  test(description: string, fn: TestFunction, options?: TestOptions): this {
+  test(description: string, fn?: TestFunction, options?: TestOptions): this {
     this.tests.push([description, fn, options]);
     return this;
   }
