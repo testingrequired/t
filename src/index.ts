@@ -2,11 +2,11 @@ import TestFunction from "./TestFunction";
 import TestOptions from "./TestOptions";
 
 export class Suite {
-  private tests: [string, TestFunction, TestOptions?][];
-  private beforeAlls: Array<() => void>;
-  private beforeEachs: Array<() => void>;
-  private afterEachs: Array<() => void>;
-  private afterAlls: Array<() => void>;
+  public tests: [string, TestFunction, TestOptions?][];
+  public beforeAlls: Array<() => void>;
+  public beforeEachs: Array<() => void>;
+  public afterEachs: Array<() => void>;
+  public afterAlls: Array<() => void>;
 
   constructor() {
     this.tests = [];
