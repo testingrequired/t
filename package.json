@@ -25,5 +25,8 @@
     "@babel/preset-typescript": "^7.8.3",
     "@types/node": "^13.7.1",
     "typescript": "^3.8.0-beta"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.8.4"
   }
 }
