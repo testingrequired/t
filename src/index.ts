@@ -16,6 +16,10 @@ export class Suite {
     this.afterAlls = [];
   }
 
+  static init() {
+    return new Suite();
+  }
+
   beforeAll(fn: () => void): this {
     this.beforeAlls.push(fn);
     return this;
