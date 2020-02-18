@@ -37,40 +37,38 @@ if (isMainThread) {
 
   suite.beforeAlls.forEach(fn => fn());
 
-  const testResults: TestResult[] = suite.tests.map(
-    ([description, fn, state]) => {
-      if (state === "Skip") {
-        return "Skip";
-      }
+  const testResults: Record<string, [TestResult, string?]> = suite.tests.reduce(
+    (results, [description, fn, state]) => {
+      switch (state) {
+        case "Skip":
+          return { ...results, [description]: ["Skip"] };
 
-      if (state === "Todo") {
-        return "Todo";
-      }
+        case "Todo":
+          return { ...results, [description]: ["Todo"] };
 
-      try {
-        fn({ assert, assertEqual: assert.strictEqual });
-        return "Pass";
-      } catch (e) {
-        if (e instanceof AssertionError) {
-          return "Fail";
-        } else {
-          return "Error";
-        }
+        default:
+          try {
+            suite.beforeEachs.forEach(fn => fn());
+            fn({ assert, assertEqual: assert.strictEqual });
+            suite.afterEachs.forEach(fn => fn());
+            return { ...results, [description]: ["Pass"] };
+          } catch (e) {
+            return {
+              ...results,
+              [description]: [
+                e instanceof AssertionError ? "Fail" : "Error",
+                e.message
+              ]
+            };
+          }
       }
-    }
+    },
+    {}
   );
 
-  const result: Result = {
-    testCount: suite.tests.length,
-    testResults: testResults
-  };
+  suite.afterAlls.forEach(fn => fn());
 
-  parentPort?.postMessage(JSON.stringify(result));
-}
-
-interface Result {
-  testCount: number;
-  testResults: string[];
+  parentPort?.postMessage(JSON.stringify(testResults));
 }
 
 type TestResult = "Pass" | "Fail" | "Error" | "Skip" | "Todo";
