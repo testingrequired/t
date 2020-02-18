@@ -16,8 +16,12 @@ export class Suite {
     this.afterAlls = [];
   }
 
-  static init() {
-    return new Suite();
+  static init(fn: (suite: Suite) => void): Suite {
+    const suite = new Suite();
+
+    fn.call(null, suite);
+
+    return suite;
   }
 
   beforeAll(fn: () => void): this {
