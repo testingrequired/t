@@ -1,8 +1,10 @@
 import TestFunction from "./TestFunction";
-import TestOptions from "./TestOptions";
+import TestRunState from "./TestRunState";
+
+export type TestDescriptionFunctionState = [string, TestFunction, TestRunState];
 
 export class Suite {
-  public tests: [string, TestFunction?, TestOptions?][];
+  public tests: TestDescriptionFunctionState[];
   public beforeAlls: Array<() => void>;
   public beforeEachs: Array<() => void>;
   public afterEachs: Array<() => void>;
@@ -44,8 +46,18 @@ export class Suite {
     return this;
   }
 
-  test(description: string, fn?: TestFunction, options?: TestOptions): this {
-    this.tests.push([description, fn, options]);
+  test(description: string, fn: TestFunction): this {
+    this.tests.push([description, fn, TestRunState.Run]);
+    return this;
+  }
+
+  skip(description: string, fn: TestFunction): this {
+    this.tests.push([description, fn, TestRunState.Skip]);
+    return this;
+  }
+
+  todo(description: string): this {
+    this.tests.push([description, () => {}, TestRunState.Todo]);
     return this;
   }
 }
