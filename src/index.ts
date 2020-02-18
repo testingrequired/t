@@ -1,51 +1,43 @@
-export type TestFunction = (_: TestFunctionArg) => void;
-
-export interface TestFunctionArg {
-  assert(value: boolean, message?: string): void;
-  assertEqual<T>(expected: T, actual: T, message?: string): void;
-}
-
-export interface TestOptions {
-  skip: boolean | string;
-}
+import TestFunction from "./TestFunction";
+import TestOptions from "./TestOptions";
 
 export class Suite {
-  #tests: [string, TestFunction, TestOptions?][];
-  #beforeAll: Array<() => void>;
-  #beforeEach: Array<() => void>;
-  #afterEach: Array<() => void>;
-  #afterAll: Array<() => void>;
+  private tests: [string, TestFunction, TestOptions?][];
+  private beforeAlls: Array<() => void>;
+  private beforeEachs: Array<() => void>;
+  private afterEachs: Array<() => void>;
+  private afterAlls: Array<() => void>;
 
   constructor() {
-    this.#tests = [];
-    this.#beforeAll = [];
-    this.#beforeEach = [];
-    this.#afterEach = [];
-    this.#afterAll = [];
+    this.tests = [];
+    this.beforeAlls = [];
+    this.beforeEachs = [];
+    this.afterEachs = [];
+    this.afterAlls = [];
   }
 
   beforeAll(fn: () => void): this {
-    this.#beforeAll.push(fn);
+    this.beforeAlls.push(fn);
     return this;
   }
 
   beforeEach(fn: () => void): this {
-    this.#beforeEach.push(fn);
+    this.beforeEachs.push(fn);
     return this;
   }
 
   afterEach(fn: () => void): this {
-    this.#afterEach.push(fn);
+    this.afterEachs.push(fn);
     return this;
   }
 
   afterAll(fn: () => void): this {
-    this.#afterAll.push(fn);
+    this.afterAlls.push(fn);
     return this;
   }
 
   test(description: string, fn: TestFunction, options?: TestOptions): this {
-    this.#tests.push([description, fn, options]);
+    this.tests.push([description, fn, options]);
     return this;
   }
 }
