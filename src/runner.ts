@@ -1,7 +1,7 @@
 import { Worker, isMainThread, workerData, parentPort } from "worker_threads";
-import { Suite } from "./index";
-import path from "path";
 import assert, { AssertionError } from "assert";
+import path from "path";
+import Suite from "./Suite";
 
 if (isMainThread) {
   const testFilePaths = process.argv.slice(2);
