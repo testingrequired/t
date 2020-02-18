@@ -1,10 +1,7 @@
-import TestFunction from "./TestFunction";
-import TestRunState from "./TestRunState";
-
-export type TestDescriptionFunctionState = [string, TestFunction, TestRunState];
+import Test, { TestFunction, TestRunState } from "./Test";
 
 export class Suite {
-  public tests: TestDescriptionFunctionState[];
+  public tests: Test[];
   public beforeAlls: Array<() => void>;
   public beforeEachs: Array<() => void>;
   public afterEachs: Array<() => void>;
@@ -47,17 +44,17 @@ export class Suite {
   }
 
   test(description: string, fn: TestFunction): this {
-    this.tests.push([description, fn, TestRunState.Run]);
+    this.tests.push({ description, fn, state: TestRunState.Run });
     return this;
   }
 
   skip(description: string, fn: TestFunction): this {
-    this.tests.push([description, fn, TestRunState.Skip]);
+    this.tests.push({ description, fn, state: TestRunState.Skip });
     return this;
   }
 
   todo(description: string): this {
-    this.tests.push([description, () => {}, TestRunState.Todo]);
+    this.tests.push({ description, fn: () => {}, state: TestRunState.Todo });
     return this;
   }
 }

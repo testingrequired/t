@@ -38,7 +38,7 @@ if (isMainThread) {
   suite.beforeAlls.forEach(fn => fn());
 
   const testResults: Record<string, [TestResult, string?]> = suite.tests.reduce(
-    (results, [description, fn, state]) => {
+    (results, { description, fn, state }) => {
       switch (state) {
         case "Skip":
           return { ...results, [description]: ["Skip"] };
