@@ -33,9 +33,15 @@ if (isMainThread) {
       console.log(value);
     });
 } else {
-  const suite: Suite = require(path.join(process.cwd(), workerData));
+  const suiteModule: any = require(path.join(process.cwd(), workerData));
 
-  suite.beforeAlls.forEach(fn => fn());
+  let suite: Suite;
+
+  if (suiteModule.default) {
+    suite = suiteModule.default;
+  } else {
+    suite = suiteModule;
+  }
 
   const testResults: Record<string, [TestResult, string?]> = suite.tests.reduce(
     (results, { description, fn, state }) => {
@@ -50,7 +56,6 @@ if (isMainThread) {
           try {
             suite.beforeEachs.forEach(fn => fn());
             fn({ assert, assertEqual: assert.strictEqual });
-            suite.afterEachs.forEach(fn => fn());
             return { ...results, [description]: ["Pass"] };
           } catch (e) {
             return {
@@ -65,8 +70,6 @@ if (isMainThread) {
     },
     {}
   );
-
-  suite.afterAlls.forEach(fn => fn());
 
   parentPort?.postMessage(JSON.stringify(testResults));
 }

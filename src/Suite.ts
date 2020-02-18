@@ -15,10 +15,8 @@ export default class Suite {
     this.afterAlls = [];
   }
 
-  static init(fn: (suite: Suite) => void): Suite {
-    const suite = new Suite();
-    fn.call(null, suite);
-    return suite;
+  static get new() {
+    return new Suite();
   }
 
   beforeAll(fn: () => void): this {

@@ -1,5 +1,5 @@
-const { Suite } = require("../lib/index");
+import Suite from "../lib/index";
 
-module.exports = Suite.init(s => {
-  s.todo("Write this test").skip("Skipping this test", () => {});
-});
+export default Suite.new
+  .todo("Write this test")
+  .skip("Skipping this test", () => {});

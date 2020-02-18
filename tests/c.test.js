@@ -1,10 +1,11 @@
-const { Suite } = require("../lib/index");
+import Suite from "../lib/index";
 
-module.exports = Suite.init(s => {
-  let value;
-  s.beforeEach(() => {
+let value;
+
+export default Suite.new
+  .beforeEach(() => {
     value = 10;
-  }).test("Testing", _ => {
+  })
+  .test("Testing", _ => {
     _.assertEqual(10, value);
   });
-});

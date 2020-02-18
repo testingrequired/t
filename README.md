@@ -4,5 +4,5 @@
 
 ```bash
 $ npm run build
-$ node ./lib/runner.js ./tests/*.test.js
+$ node -r esm ./lib/runner.js ./tests/*.test.js
 ```

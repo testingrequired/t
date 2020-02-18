@@ -24,6 +24,7 @@
     "@babel/preset-env": "^7.8.4",
     "@babel/preset-typescript": "^7.8.3",
     "@types/node": "^13.7.1",
+    "esm": "^3.2.25",
     "typescript": "^3.8.0-beta"
   },
   "dependencies": {

@@ -1,7 +1,5 @@
-const { Suite } = require("../lib/index");
+import Suite from "../lib/index";
 
-module.exports = Suite.init(s => {
-  s.test("Testing", _ => {
-    _.assert(true);
-  });
+export default Suite.new.test("Testing", _ => {
+  _.assert(true);
 });
