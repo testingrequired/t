@@ -10,7 +10,7 @@ $ npm run build
 
 ## Usage
 
-Create a test file `./tests/example.test.js`:
+Create a test file `./tests/example.test.js`. Test files are modules that export a suite:
 
 ```javascript
 import suite from "@testingrequired/t";
@@ -35,6 +35,8 @@ export default suite(({ test, beforeEach }) => {
 ```
 
 ## Running
+
+Test file paths are passed to the runner and are run in parallel.
 
 ```bash
 $ node -r esm ./lib/runner.js ./tests/example.test.js ...
