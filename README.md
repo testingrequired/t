@@ -43,3 +43,13 @@ Test file paths are passed to the runner and are run in parallel.
 ```bash
 $ node -r esm ./lib/runner.js ./tests/example.test.js
 ```
+
+## Config
+
+A `.trc` configuration file can be created and will override any command line configuration.
+
+```javascript
+{
+  "pattern": "./tests/*.test.js"
+}
+```

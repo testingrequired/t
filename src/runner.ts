@@ -1,16 +1,38 @@
 import { Worker, isMainThread, workerData, parentPort } from "worker_threads";
 import assert, { AssertionError } from "assert";
 import path from "path";
+import fs from "fs";
 import { promisify } from "util";
 import glob from "glob";
 import Suite from "./Suite";
 import { TestResult } from "./Test";
+import { Config } from "./Config";
 
 if (isMainThread) {
   (async () => {
     const args = process.argv.slice(2);
 
-    const [pattern] = args;
+    const trcPath = path.join(process.cwd(), ".trc");
+
+    let trcConfig: Config;
+
+    console.log(`trcConfig path: ${trcPath} ${fs.existsSync(trcPath)}`);
+
+    if (await promisify(fs.exists)(trcPath)) {
+      try {
+        const trcRaw = await promisify(fs.readFile)(trcPath, {
+          encoding: "utf8"
+        });
+
+        trcConfig = JSON.parse(trcRaw);
+      } catch (e) {
+        trcConfig = {};
+      }
+    } else {
+      trcConfig = {};
+    }
+
+    const pattern = trcConfig?.pattern ? trcConfig?.pattern : args[0];
 
     const testFilePaths = await promisify(glob)(pattern);
 
