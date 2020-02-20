@@ -1,38 +1,44 @@
 import { Worker, isMainThread, workerData, parentPort } from "worker_threads";
 import assert, { AssertionError } from "assert";
 import path from "path";
+import { promisify } from "util";
+import glob from "glob";
 import Suite from "./Suite";
 import { TestResult } from "./Test";
 
 if (isMainThread) {
-  const testFilePaths = process.argv.slice(2);
+  (async () => {
+    const args = process.argv.slice(2);
 
-  Promise.all(
-    testFilePaths.map(testFilePath => {
-      return new Promise((resolve, reject) => {
-        const worker = new Worker(__filename, { workerData: testFilePath });
+    const testFilePaths = await promisify(glob)(args[0]);
 
-        worker.on("message", message => {
-          resolve(`${testFilePath}: message: ${message}`);
+    Promise.all(
+      testFilePaths.map(testFilePath => {
+        return new Promise((resolve, reject) => {
+          const worker = new Worker(__filename, { workerData: testFilePath });
+
+          worker.on("message", message => {
+            resolve(`${testFilePath}: message: ${message}`);
+          });
+
+          worker.on("error", error => {
+            console.log(error);
+            reject(`${testFilePath}: error: ${error.message}`);
+          });
+
+          worker.on("exit", code => {
+            resolve(`${testFilePath}: exit: ${code}`);
+          });
         });
-
-        worker.on("error", error => {
-          console.log(error);
-          reject(`${testFilePath}: error: ${error.message}`);
-        });
-
-        worker.on("exit", code => {
-          resolve(`${testFilePath}: exit: ${code}`);
-        });
+      })
+    )
+      .catch(e => {
+        console.log(`ERROR: ${JSON.stringify(e)}`);
+      })
+      .then((...value) => {
+        console.log(value);
       });
-    })
-  )
-    .catch(e => {
-      console.log(`ERROR: ${JSON.stringify(e)}`);
-    })
-    .then((...value) => {
-      console.log(value);
-    });
+  })();
 } else {
   const suiteModule: any = require(path.join(process.cwd(), workerData));
 

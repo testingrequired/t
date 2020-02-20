@@ -11,7 +11,7 @@
     "build:js": "babel src --out-dir lib --extensions \".ts,.tsx\" --source-maps inline",
     "prepublishOnly": "npm run verify && npm run build",
     "pack-preview": "npm pack && tar -xvzf *.tgz && rm -rf package *.tgz",
-    "test": "",
+    "test": "node -r esm ./lib/runner.js tests/*.test.js",
     "verify": "npm run test && npm run cli"
   },
   "keywords": [],
@@ -23,11 +23,13 @@
     "@babel/plugin-transform-runtime": "^7.8.3",
     "@babel/preset-env": "^7.8.4",
     "@babel/preset-typescript": "^7.8.3",
+    "@types/glob": "^7.1.1",
     "@types/node": "^13.7.1",
     "esm": "^3.2.25",
     "typescript": "^3.8.0-beta"
   },
   "dependencies": {
-    "@babel/runtime": "^7.8.4"
+    "@babel/runtime": "^7.8.4",
+    "glob": "^7.1.6"
   }
 }
