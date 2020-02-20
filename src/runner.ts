@@ -22,7 +22,7 @@ if (isMainThread) {
       process.exit(1);
     }
 
-    const pattern = trcConfig?.pattern ?? patternFromArgs;
+    const pattern = patternFromArgs ?? trcConfig?.pattern;
 
     if (!pattern) {
       console.log(

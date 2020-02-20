@@ -36,20 +36,24 @@ export default suite(({ test, beforeEach }) => {
 
 The following functions are available in the `suite` callback: `beforeEach`, `afterEach`, `beforeAll`, `afterAll`, `test`, `skip`, `todo`
 
-## Running
+## Configuration
 
-A glob pattern to identify test files is passed as the runners only argument:
+An optional configuration file `.trc` can be created:
 
-```bash
-$ node -r esm ./lib/runner.js ./tests/*.test.js
+```typescript
+{
+  pattern?: string; // Test file glob pattern. Default: tests/**/*.test.js
+}
 ```
 
-## Config
+## Running
 
-A `.trc` configuration file can be created and will override any command line configuration.
+```bash
+$ node -r esm ./lib/runner.js
+```
 
-```javascript
-{
-  "pattern": "./tests/*.test.js"
-}
+You can also override the configured test file pattern:
+
+```bash
+$ node -r esm ./lib/runner.js src/**/*.spec.js
 ```
