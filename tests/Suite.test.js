@@ -2,6 +2,7 @@ import suite from "../lib/index";
 import Suite from "../lib/Suite";
 
 export default suite(({ beforeEach, test }) => {
+  const expectedTestName = "test name";
   const expectedFn = _ => {};
 
   /**
@@ -11,6 +12,10 @@ export default suite(({ beforeEach, test }) => {
 
   beforeEach(() => {
     suite = new Suite();
+  });
+
+  test("static new method should return a suite", _ => {
+    _.assert(Suite.new instanceof Suite);
   });
 
   test("should have no tests", _ => {
@@ -25,6 +30,25 @@ export default suite(({ beforeEach, test }) => {
 
     _.assertEqual(expectedTestName, suite.tests[0].description);
     _.assertEqual(expectedFn, suite.tests[0].fn);
+    _.assertEqual(expectedTestRunState, suite.tests[0].state);
+  });
+
+  test("skip should add a skipped test", _ => {
+    const expectedTestRunState = "Skip";
+
+    suite.skip(expectedTestName, expectedFn);
+
+    _.assertEqual(expectedTestName, suite.tests[0].description);
+    _.assertEqual(expectedFn, suite.tests[0].fn);
+    _.assertEqual(expectedTestRunState, suite.tests[0].state);
+  });
+
+  test("todo should add a todo test", _ => {
+    const expectedTestRunState = "Todo";
+
+    suite.todo(expectedTestName);
+
+    _.assertEqual(expectedTestName, suite.tests[0].description);
     _.assertEqual(expectedTestRunState, suite.tests[0].state);
   });
 
