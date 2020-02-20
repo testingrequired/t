@@ -38,10 +38,10 @@ The following functions are available in the `suite` callback: `beforeEach`, `af
 
 ## Running
 
-Test file paths are passed to the runner and are run in parallel.
+A glob pattern to identify test files is passed as the runners only argument:
 
 ```bash
-$ node -r esm ./lib/runner.js ./tests/example.test.js
+$ node -r esm ./lib/runner.js ./tests/*.test.js
 ```
 
 ## Config
