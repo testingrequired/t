@@ -49,11 +49,11 @@ An optional configuration file `.trc` can be created:
 ## Running
 
 ```bash
-$ node -r esm ./lib/runner.js
+$ npm run test
 ```
 
 You can also override the configured test file pattern:
 
 ```bash
-$ node -r esm ./lib/runner.js src/**/*.spec.js
+$ npm run test -- src/**/*.spec.js
 ```
