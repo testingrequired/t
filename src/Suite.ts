@@ -24,7 +24,9 @@ export default class Suite {
 
     this.test = this.test.bind(this);
     this.skip = this.skip.bind(this);
+    (this.test as any).skip = this.skip;
     this.todo = this.todo.bind(this);
+    (this.test as any).todo = this.todo;
     this.beforeAll = this.beforeAll.bind(this);
     this.beforeEach = this.beforeEach.bind(this);
     this.afterEach = this.afterEach.bind(this);
