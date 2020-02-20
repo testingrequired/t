@@ -1,11 +1,13 @@
-import Suite from "../lib/index";
+import suite from "../lib/index";
 
-let value;
+export default suite(({ test, beforeEach }) => {
+  let value;
 
-export default Suite.new
-  .beforeEach(() => {
+  beforeEach(() => {
     value = 10;
-  })
-  .test("Testing", _ => {
+  });
+
+  test("Testing", _ => {
     _.assertEqual(10, value);
   });
+});

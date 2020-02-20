@@ -13,25 +13,23 @@ $ npm run build
 Create a test file `./tests/example.test.js`:
 
 ```javascript
-import Suite from "@testingrequired/t";
+import suite from "@testingrequired/t";
 
-const expectedValue = Symbol();
+export default suite(({ test, beforeEach }) => {
+  let value;
 
-let value;
+  beforeEach(() => {
+    value = 10;
+  });
 
-export default Suite.new
-  .beforeEach(() => {
-    value = expectedValue;
-  })
-  .test("This test will pass", _ => _.assertEquals(expectedValue, value))
-  .skip("Skipping this test", _ =>
-    _.assert(false, "This assertion will never happen")
-  )
-  .todo("Need to write this test");
+  test("Testing", _ => {
+    _.assertEqual(10, value);
+  });
+});
 ```
 
 ## Running
 
 ```bash
-$ node -r esm ./lib/runner.js ./tests/*.test.js
+$ node -r esm ./lib/runner.js ./tests/example.test.js ...
 ```

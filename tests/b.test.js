@@ -1,5 +1,7 @@
-import Suite from "../lib/index";
+import suite from "../lib/index";
 
-export default Suite.new.test("Testing", _ => {
-  _.assert(true);
+export default suite(({ test }) => {
+  test("Testing", _ => {
+    _.assert(true);
+  });
 });

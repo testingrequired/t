@@ -13,6 +13,14 @@ export default class Suite {
     this.beforeEachs = [];
     this.afterEachs = [];
     this.afterAlls = [];
+
+    this.test = this.test.bind(this);
+    this.skip = this.skip.bind(this);
+    this.todo = this.todo.bind(this);
+    this.beforeAll = this.beforeAll.bind(this);
+    this.beforeEach = this.beforeEach.bind(this);
+    this.afterEach = this.afterEach.bind(this);
+    this.afterAll = this.afterAll.bind(this);
   }
 
   static get new() {

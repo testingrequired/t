@@ -1,5 +1,6 @@
-import Suite from "../lib/index";
+import suite from "../lib/index";
 
-export default Suite.new
-  .todo("Write this test")
-  .skip("Skipping this test", () => {});
+export default suite(({ todo, skip }) => {
+  todo("Write this test");
+  skip("Skipping this test", () => {});
+});
