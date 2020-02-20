@@ -33,34 +33,29 @@ if (isMainThread) {
 
     const testFilePaths = await promisify(glob)(pattern);
 
-    try {
-      console.log(
-        await Promise.all(
-          testFilePaths.map(testFilePath => {
-            return new Promise((resolve, reject) => {
-              const worker = new Worker(__filename, {
-                workerData: testFilePath
-              });
+    const results = await Promise.all(
+      testFilePaths.map(testFilePath => {
+        return new Promise((resolve, reject) => {
+          const worker = new Worker(__filename, {
+            workerData: testFilePath
+          });
 
-              worker.on("message", message => {
-                resolve(`${testFilePath}: message: ${message}`);
-              });
+          worker.on("message", message => resolve(JSON.parse(message)));
 
-              worker.on("error", error => {
-                console.log(error);
-                reject(`${testFilePath}: error: ${error.message}`);
-              });
+          worker.on("error", error => reject(error));
 
-              worker.on("exit", code => {
-                resolve(`${testFilePath}: exit: ${code}`);
-              });
-            });
-          })
-        )
-      );
-    } catch (e) {
-      console.log(`ERROR: ${JSON.stringify(e)}`);
-    }
+          worker.on("exit", code =>
+            reject(`This shouldn't happen: ${testFilePath} exited with ${code}`)
+          );
+        });
+      })
+    );
+
+    console.log(
+      results.reduce((acc: object, item, i) => {
+        return { ...acc, [testFilePaths[i]]: item };
+      }, {})
+    );
   })();
 } else {
   const suiteModule: any = require(path.join(process.cwd(), workerData));
