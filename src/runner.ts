@@ -10,7 +10,9 @@ if (isMainThread) {
   (async () => {
     const args = process.argv.slice(2);
 
-    const testFilePaths = await promisify(glob)(args[0]);
+    const [pattern] = args;
+
+    const testFilePaths = await promisify(glob)(pattern);
 
     Promise.all(
       testFilePaths.map(testFilePath => {
