@@ -46,7 +46,7 @@ An optional configuration file `.trc` can be created:
 
 ```typescript
 {
-  pattern?: string; // Test file glob pattern. Default: tests/**/*.test.js
+  pattern?: string; // Test file glob pattern. Default: src/**/*.test.js
 }
 ```
 
