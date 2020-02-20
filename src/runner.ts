@@ -12,10 +12,24 @@ if (isMainThread) {
   (async () => {
     const [patternFromArgs] = process.argv.slice(2);
 
-    const trcPath = path.join(process.cwd(), ".trc");
-    const trcConfig = await getTrcConfig(trcPath);
+    let trcConfig: Config;
+
+    try {
+      const trcPath = path.join(process.cwd(), ".trc");
+      trcConfig = await getTrcConfig(trcPath);
+    } catch (e) {
+      console.log(`Error occurred reading .trc file: ${e.message}`);
+      process.exit(1);
+    }
 
     const pattern = trcConfig?.pattern ?? patternFromArgs;
+
+    if (!pattern) {
+      console.log(
+        `Test file pattern could not be determined from a .trc file or from runner args`
+      );
+      process.exit(1);
+    }
 
     const testFilePaths = await promisify(glob)(pattern);
 
@@ -65,19 +79,11 @@ if (isMainThread) {
 }
 
 async function getTrcConfig(trcPath: string): Promise<Config> {
-  const trcExists = await promisify(fs.exists)(trcPath);
-  let trcConfig: Config;
+  if (!(await promisify(fs.exists)(trcPath))) return {};
 
-  if (!trcExists) return {};
-
-  try {
-    const encoding = "utf8";
-    trcConfig = JSON.parse(await promisify(fs.readFile)(trcPath, { encoding }));
-  } catch (e) {
-    trcConfig = {};
-  }
-
-  return trcConfig;
+  return JSON.parse(
+    await promisify(fs.readFile)(trcPath, { encoding: "utf8" })
+  );
 }
 
 function runSuiteTests(suite: Suite): Record<string, [TestResult, string?]> {
