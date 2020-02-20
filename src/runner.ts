@@ -7,6 +7,7 @@ import glob from "glob";
 import Suite from "./Suite";
 import { TestResult } from "./Test";
 import { Config } from "./Config";
+import createSpy from "./spy";
 
 if (isMainThread) {
   (async () => {
@@ -81,7 +82,9 @@ async function getTrcConfig(trcPath: string): Promise<Config> {
   );
 }
 
-function runSuiteTests(suite: Suite): Record<string, [TestResult, string?]> {
+export function runSuiteTests(
+  suite: Suite
+): Record<string, [TestResult, string?]> {
   const testResults: Record<string, [TestResult, string?]> = suite.tests.reduce(
     (results, { description, fn, state }) => {
       switch (state) {
@@ -94,7 +97,7 @@ function runSuiteTests(suite: Suite): Record<string, [TestResult, string?]> {
         default:
           try {
             suite.beforeEachs.forEach(fn => fn());
-            fn({ assert, assertEqual: assert.strictEqual });
+            fn({ assert, assertEqual: assert.strictEqual, spy: createSpy });
             return { ...results, [description]: ["Pass"] };
           } catch (e) {
             return {

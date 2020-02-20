@@ -19,16 +19,12 @@ export default suite(({ beforeEach, test, todo }) => {
   });
 
   test("suite should callback with created suite", _ => {
-    const calls = [];
-
-    function spy(...args) {
-      calls.push(args);
-    }
+    const spy = _.spy();
 
     suite(spy);
 
-    _.assertEqual(1, calls.length);
-    _.assert(calls[0][0] instanceof Suite);
+    _.assertEqual(1, spy.calls.length);
+    _.assert(spy.calls[0][0] instanceof Suite);
   });
 
   test("static new method should return a suite", _ => {

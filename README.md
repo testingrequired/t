@@ -36,6 +36,10 @@ export default suite(({ test, beforeEach }) => {
 
 The following functions are available in the `suite` callback: `beforeEach`, `afterEach`, `beforeAll`, `afterAll`, `test`, `skip`, `todo`
 
+### Test
+
+The test function is passed an object with the properties: `assert`, `assertEqual`, `spy`.
+
 ## Configuration
 
 An optional configuration file `.trc` can be created:

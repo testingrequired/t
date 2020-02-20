@@ -17,6 +17,7 @@ export interface TestFunction {
 export interface TestFunctionArg {
   assert(value: boolean, message?: string): void;
   assertEqual<T>(expected: T, actual: T, message?: string): void;
+  spy: () => Function;
 }
 
 export type TestResult = "Pass" | "Fail" | "Error" | "Skip" | "Todo";
