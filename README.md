@@ -34,10 +34,12 @@ export default suite(({ test, beforeEach }) => {
 });
 ```
 
+The following functions are available in the `suite` callback: `beforeEach`, `afterEach`, `beforeAll`, `afterAll`, `test`, `skip`, `todo`
+
 ## Running
 
 Test file paths are passed to the runner and are run in parallel.
 
 ```bash
-$ node -r esm ./lib/runner.js ./tests/example.test.js ...
+$ node -r esm ./lib/runner.js ./tests/example.test.js
 ```
