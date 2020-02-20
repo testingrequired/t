@@ -1,17 +1,34 @@
 import suite from "../lib/index";
 import Suite from "../lib/Suite";
 
-export default suite(({ beforeEach, test }) => {
+export default suite(({ beforeEach, test, todo }) => {
   const expectedTestName = "test name";
   const expectedFn = _ => {};
 
   /**
    * @type {Suite}
    */
-  let suite;
+  let testSuite;
 
   beforeEach(() => {
-    suite = new Suite();
+    testSuite = new Suite();
+  });
+
+  test("suite should return a suite", _ => {
+    _.assert(suite(() => {}) instanceof Suite);
+  });
+
+  test("suite should callback with created suite", _ => {
+    const calls = [];
+
+    function spy(...args) {
+      calls.push(args);
+    }
+
+    suite(spy);
+
+    _.assertEqual(1, calls.length);
+    _.assert(calls[0][0] instanceof Suite);
   });
 
   test("static new method should return a suite", _ => {
@@ -19,80 +36,80 @@ export default suite(({ beforeEach, test }) => {
   });
 
   test("should have no tests", _ => {
-    _.assertEqual(suite.tests.length, 0);
+    _.assertEqual(testSuite.tests.length, 0);
   });
 
   test("test should add a test", _ => {
     const expectedTestName = "test name";
     const expectedTestRunState = "Run";
 
-    suite.test(expectedTestName, expectedFn);
+    testSuite.test(expectedTestName, expectedFn);
 
-    _.assertEqual(expectedTestName, suite.tests[0].description);
-    _.assertEqual(expectedFn, suite.tests[0].fn);
-    _.assertEqual(expectedTestRunState, suite.tests[0].state);
+    _.assertEqual(expectedTestName, testSuite.tests[0].description);
+    _.assertEqual(expectedFn, testSuite.tests[0].fn);
+    _.assertEqual(expectedTestRunState, testSuite.tests[0].state);
   });
 
   test("skip should add a skipped test", _ => {
     const expectedTestRunState = "Skip";
 
-    suite.skip(expectedTestName, expectedFn);
+    testSuite.skip(expectedTestName, expectedFn);
 
-    _.assertEqual(expectedTestName, suite.tests[0].description);
-    _.assertEqual(expectedFn, suite.tests[0].fn);
-    _.assertEqual(expectedTestRunState, suite.tests[0].state);
+    _.assertEqual(expectedTestName, testSuite.tests[0].description);
+    _.assertEqual(expectedFn, testSuite.tests[0].fn);
+    _.assertEqual(expectedTestRunState, testSuite.tests[0].state);
   });
 
   test("todo should add a todo test", _ => {
     const expectedTestRunState = "Todo";
 
-    suite.todo(expectedTestName);
+    testSuite.todo(expectedTestName);
 
-    _.assertEqual(expectedTestName, suite.tests[0].description);
-    _.assertEqual(expectedTestRunState, suite.tests[0].state);
+    _.assertEqual(expectedTestName, testSuite.tests[0].description);
+    _.assertEqual(expectedTestRunState, testSuite.tests[0].state);
   });
 
   test("should have no beforeEachs", _ => {
-    _.assertEqual(suite.beforeEachs.length, 0);
+    _.assertEqual(testSuite.beforeEachs.length, 0);
   });
 
   test("beforeEach should add a beforeEach", _ => {
-    suite.beforeEach(expectedFn);
+    testSuite.beforeEach(expectedFn);
 
-    _.assertEqual(1, suite.beforeEachs.length);
-    _.assertEqual(expectedFn, suite.beforeEachs[0]);
+    _.assertEqual(1, testSuite.beforeEachs.length);
+    _.assertEqual(expectedFn, testSuite.beforeEachs[0]);
   });
 
   test("should have no afterEachs", _ => {
-    _.assertEqual(suite.afterEachs.length, 0);
+    _.assertEqual(testSuite.afterEachs.length, 0);
   });
 
   test("afterEach should add a afterEach", _ => {
-    suite.afterEach(expectedFn);
+    testSuite.afterEach(expectedFn);
 
-    _.assertEqual(1, suite.afterEachs.length);
-    _.assertEqual(expectedFn, suite.afterEachs[0]);
+    _.assertEqual(1, testSuite.afterEachs.length);
+    _.assertEqual(expectedFn, testSuite.afterEachs[0]);
   });
 
   test("should have no beforeAlls", _ => {
-    _.assertEqual(suite.beforeAlls.length, 0);
+    _.assertEqual(testSuite.beforeAlls.length, 0);
   });
 
   test("beforeEach should add a beforeEach", _ => {
-    suite.beforeAll(expectedFn);
+    testSuite.beforeAll(expectedFn);
 
-    _.assertEqual(1, suite.beforeAlls.length);
-    _.assertEqual(expectedFn, suite.beforeAlls[0]);
+    _.assertEqual(1, testSuite.beforeAlls.length);
+    _.assertEqual(expectedFn, testSuite.beforeAlls[0]);
   });
 
   test("should have no afterAlls", _ => {
-    _.assertEqual(suite.afterAlls.length, 0);
+    _.assertEqual(testSuite.afterAlls.length, 0);
   });
 
   test("afterAll should add a afterAll", _ => {
-    suite.afterAll(expectedFn);
+    testSuite.afterAll(expectedFn);
 
-    _.assertEqual(1, suite.afterAlls.length);
-    _.assertEqual(expectedFn, suite.afterAlls[0]);
+    _.assertEqual(1, testSuite.afterAlls.length);
+    _.assertEqual(expectedFn, testSuite.afterAlls[0]);
   });
 });
