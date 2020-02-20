@@ -2,6 +2,7 @@ import { Worker, isMainThread, workerData, parentPort } from "worker_threads";
 import assert, { AssertionError } from "assert";
 import path from "path";
 import Suite from "./Suite";
+import { TestResult } from "./Test";
 
 if (isMainThread) {
   const testFilePaths = process.argv.slice(2);
@@ -43,6 +44,12 @@ if (isMainThread) {
     suite = suiteModule;
   }
 
+  const testResults = runSuiteTests(suite);
+
+  parentPort?.postMessage(JSON.stringify(testResults));
+}
+
+function runSuiteTests(suite: Suite): Record<string, [TestResult, string?]> {
   const testResults: Record<string, [TestResult, string?]> = suite.tests.reduce(
     (results, { description, fn, state }) => {
       switch (state) {
@@ -71,7 +78,5 @@ if (isMainThread) {
     {}
   );
 
-  parentPort?.postMessage(JSON.stringify(testResults));
+  return testResults;
 }
-
-type TestResult = "Pass" | "Fail" | "Error" | "Skip" | "Todo";

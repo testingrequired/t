@@ -7,7 +7,5 @@ export default suite(({ test, beforeEach }) => {
     value = 10;
   });
 
-  test("Testing", _ => {
-    _.assertEqual(10, value);
-  });
+  test("Testing", _ => _.assertEqual(10, value));
 });
