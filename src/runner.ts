@@ -10,58 +10,43 @@ import { Config } from "./Config";
 
 if (isMainThread) {
   (async () => {
-    const args = process.argv.slice(2);
+    const [patternFromArgs] = process.argv.slice(2);
 
     const trcPath = path.join(process.cwd(), ".trc");
+    const trcConfig = await getTrcConfig(trcPath);
 
-    let trcConfig: Config;
-
-    console.log(`trcConfig path: ${trcPath} ${fs.existsSync(trcPath)}`);
-
-    if (await promisify(fs.exists)(trcPath)) {
-      try {
-        const trcRaw = await promisify(fs.readFile)(trcPath, {
-          encoding: "utf8"
-        });
-
-        trcConfig = JSON.parse(trcRaw);
-      } catch (e) {
-        trcConfig = {};
-      }
-    } else {
-      trcConfig = {};
-    }
-
-    const pattern = trcConfig?.pattern ? trcConfig?.pattern : args[0];
+    const pattern = trcConfig?.pattern ?? patternFromArgs;
 
     const testFilePaths = await promisify(glob)(pattern);
 
-    Promise.all(
-      testFilePaths.map(testFilePath => {
-        return new Promise((resolve, reject) => {
-          const worker = new Worker(__filename, { workerData: testFilePath });
+    try {
+      console.log(
+        await Promise.all(
+          testFilePaths.map(testFilePath => {
+            return new Promise((resolve, reject) => {
+              const worker = new Worker(__filename, {
+                workerData: testFilePath
+              });
 
-          worker.on("message", message => {
-            resolve(`${testFilePath}: message: ${message}`);
-          });
+              worker.on("message", message => {
+                resolve(`${testFilePath}: message: ${message}`);
+              });
 
-          worker.on("error", error => {
-            console.log(error);
-            reject(`${testFilePath}: error: ${error.message}`);
-          });
+              worker.on("error", error => {
+                console.log(error);
+                reject(`${testFilePath}: error: ${error.message}`);
+              });
 
-          worker.on("exit", code => {
-            resolve(`${testFilePath}: exit: ${code}`);
-          });
-        });
-      })
-    )
-      .catch(e => {
-        console.log(`ERROR: ${JSON.stringify(e)}`);
-      })
-      .then((...value) => {
-        console.log(value);
-      });
+              worker.on("exit", code => {
+                resolve(`${testFilePath}: exit: ${code}`);
+              });
+            });
+          })
+        )
+      );
+    } catch (e) {
+      console.log(`ERROR: ${JSON.stringify(e)}`);
+    }
   })();
 } else {
   const suiteModule: any = require(path.join(process.cwd(), workerData));
@@ -77,6 +62,22 @@ if (isMainThread) {
   const testResults = runSuiteTests(suite);
 
   parentPort?.postMessage(JSON.stringify(testResults));
+}
+
+async function getTrcConfig(trcPath: string): Promise<Config> {
+  const trcExists = await promisify(fs.exists)(trcPath);
+  let trcConfig: Config;
+
+  if (!trcExists) return {};
+
+  try {
+    const encoding = "utf8";
+    trcConfig = JSON.parse(await promisify(fs.readFile)(trcPath, { encoding }));
+  } catch (e) {
+    trcConfig = {};
+  }
+
+  return trcConfig;
 }
 
 function runSuiteTests(suite: Suite): Record<string, [TestResult, string?]> {

@@ -12,7 +12,7 @@
     "prepublishOnly": "npm run verify && npm run build",
     "pack-preview": "npm pack && tar -xvzf *.tgz && rm -rf package *.tgz",
     "pretest": "npm run build",
-    "test": "node -r esm ./lib/runner.js"
+    "test": "node -r esm ./lib/runner.js ./tests/a.test.js"
   },
   "keywords": [],
   "author": "Kylee Tilley <kylee@testingrequired.com>",
