@@ -25,6 +25,12 @@ export default suite(({ test, beforeEach }) => {
   test("Testing", _ => {
     _.assertEqual(10, value);
   });
+
+  test.skip("Test will skip", _ => {
+    _.assertEqual(10, value);
+  });
+
+  test.todo("Write this test");
 });
 ```
 
