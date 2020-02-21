@@ -24,4 +24,4 @@ export type TestResultState = "Pass" | "Fail" | "Error" | "Skip" | "Todo";
 
 export type TestResultStateAndMessage = [TestResultState, string?];
 
-export type TestResult = Record<string, TestResultStateAndMessage>;
+export type TestResults = Record<string, TestResultStateAndMessage>;
