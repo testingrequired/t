@@ -8,6 +8,12 @@ import runSuiteTests from "./runSuiteTests";
 import getTrcConfig from "./getTrcConfig";
 
 if (isMainThread) {
+  mainThread();
+} else {
+  debugThread();
+}
+
+function mainThread() {
   const trcPath = path.join(process.cwd(), ".trc");
 
   (async () => {
@@ -47,7 +53,30 @@ if (isMainThread) {
 
     console.log(resultsFormatted);
   })();
-} else {
+
+  async function getPattern(trcConfig: Config) {
+    const [patternFromArgs] = process.argv.slice(2);
+    return patternFromArgs ?? trcConfig.pattern;
+  }
+
+  function mapTestFilePathToWorker(testFilePath: string) {
+    return new Promise((resolve, reject) => {
+      const worker = new Worker(__filename, {
+        workerData: testFilePath
+      });
+
+      worker.on("message", resolve);
+
+      worker.on("error", reject);
+
+      worker.on("exit", code =>
+        reject(`This shouldn't happen: ${testFilePath} exited with ${code}`)
+      );
+    });
+  }
+}
+
+function debugThread() {
   const suiteModule: any = require(path.join(process.cwd(), workerData));
 
   let suite: Suite;
@@ -61,25 +90,4 @@ if (isMainThread) {
   const testResults = runSuiteTests(suite);
 
   parentPort?.postMessage(testResults);
-}
-
-async function getPattern(trcConfig: Config) {
-  const [patternFromArgs] = process.argv.slice(2);
-  return patternFromArgs ?? trcConfig.pattern;
-}
-
-function mapTestFilePathToWorker(testFilePath: string) {
-  return new Promise((resolve, reject) => {
-    const worker = new Worker(__filename, {
-      workerData: testFilePath
-    });
-
-    worker.on("message", resolve);
-
-    worker.on("error", reject);
-
-    worker.on("exit", code =>
-      reject(`This shouldn't happen: ${testFilePath} exited with ${code}`)
-    );
-  });
 }
