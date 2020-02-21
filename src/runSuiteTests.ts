@@ -5,7 +5,7 @@ import createSpy from "./spy";
 
 export default function runSuiteTests(suite: Suite): TestResults {
   const testResults: TestResults = suite.tests.reduce(
-    (results, { description, fn, state }) => {
+    (results, { description, fn, runState: state }) => {
       let result: TestResultStateAndMessage;
 
       switch (state) {

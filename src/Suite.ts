@@ -59,17 +59,17 @@ export default class Suite {
   }
 
   test(description: string, fn: TestFunction): this {
-    this.tests.push({ description, fn, state: TestRunState.Run });
+    this.tests.push({ description, fn, runState: TestRunState.Run });
     return this;
   }
 
   skip(description: string, fn: TestFunction): this {
-    this.tests.push({ description, fn, state: TestRunState.Skip });
+    this.tests.push({ description, fn, runState: TestRunState.Skip });
     return this;
   }
 
   todo(description: string): this {
-    this.tests.push({ description, fn: () => {}, state: TestRunState.Todo });
+    this.tests.push({ description, fn: () => {}, runState: TestRunState.Todo });
     return this;
   }
 }

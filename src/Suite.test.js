@@ -43,7 +43,7 @@ export default suite(({ beforeEach, test }) => {
 
     _.assertEqual(expectedTestName, testSuite.tests[0].description);
     _.assertEqual(expectedFn, testSuite.tests[0].fn);
-    _.assertEqual(expectedTestRunState, testSuite.tests[0].state);
+    _.assertEqual(expectedTestRunState, testSuite.tests[0].runState);
   });
 
   test("skip should add a skipped test", _ => {
@@ -53,7 +53,7 @@ export default suite(({ beforeEach, test }) => {
 
     _.assertEqual(expectedTestName, testSuite.tests[0].description);
     _.assertEqual(expectedFn, testSuite.tests[0].fn);
-    _.assertEqual(expectedTestRunState, testSuite.tests[0].state);
+    _.assertEqual(expectedTestRunState, testSuite.tests[0].runState);
   });
 
   test("todo should add a todo test", _ => {
@@ -62,7 +62,7 @@ export default suite(({ beforeEach, test }) => {
     testSuite.todo(expectedTestName);
 
     _.assertEqual(expectedTestName, testSuite.tests[0].description);
-    _.assertEqual(expectedTestRunState, testSuite.tests[0].state);
+    _.assertEqual(expectedTestRunState, testSuite.tests[0].runState);
   });
 
   test("should have no beforeEachs", _ => {

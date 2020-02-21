@@ -1,7 +1,7 @@
 export default interface Test {
   description: string;
   fn: TestFunction;
-  state: TestRunState;
+  runState: TestRunState;
 }
 
 export enum TestRunState {
