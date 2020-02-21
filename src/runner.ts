@@ -1,13 +1,11 @@
 import { Worker, isMainThread, workerData, parentPort } from "worker_threads";
-import assert, { AssertionError } from "assert";
 import path from "path";
-import fs from "fs";
 import { promisify } from "util";
 import glob from "glob";
 import Suite from "./Suite";
-import { TestResult } from "./Test";
 import { Config } from "./Config";
-import createSpy from "./spy";
+import runSuiteTests from "./runSuiteTests";
+import getTrcConfig from "./getTrcConfig";
 
 if (isMainThread) {
   (async () => {
@@ -23,7 +21,7 @@ if (isMainThread) {
       process.exit(1);
     }
 
-    const pattern = patternFromArgs ?? trcConfig?.pattern;
+    const pattern = patternFromArgs ?? trcConfig.pattern;
 
     if (!pattern) {
       console.log(
@@ -72,46 +70,4 @@ if (isMainThread) {
   const testResults = runSuiteTests(suite);
 
   parentPort?.postMessage(JSON.stringify(testResults));
-}
-
-async function getTrcConfig(trcPath: string): Promise<Config> {
-  if (!(await promisify(fs.exists)(trcPath))) return {};
-
-  return JSON.parse(
-    await promisify(fs.readFile)(trcPath, { encoding: "utf8" })
-  );
-}
-
-export function runSuiteTests(
-  suite: Suite
-): Record<string, [TestResult, string?]> {
-  const testResults: Record<string, [TestResult, string?]> = suite.tests.reduce(
-    (results, { description, fn, state }) => {
-      switch (state) {
-        case "Skip":
-          return { ...results, [description]: ["Skip"] };
-
-        case "Todo":
-          return { ...results, [description]: ["Todo"] };
-
-        default:
-          try {
-            suite.beforeEachs.forEach(fn => fn());
-            fn({ assert, assertEqual: assert.strictEqual, spy: createSpy });
-            return { ...results, [description]: ["Pass"] };
-          } catch (e) {
-            return {
-              ...results,
-              [description]: [
-                e instanceof AssertionError ? "Fail" : "Error",
-                e.message
-              ]
-            };
-          }
-      }
-    },
-    {}
-  );
-
-  return testResults;
 }

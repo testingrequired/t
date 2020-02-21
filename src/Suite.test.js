@@ -1,7 +1,7 @@
 import suite from "../lib/index";
 import Suite from "../lib/Suite";
 
-export default suite(({ beforeEach, test, todo }) => {
+export default suite(({ beforeEach, test }) => {
   const expectedTestName = "test name";
   const expectedFn = _ => {};
 
