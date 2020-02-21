@@ -2,6 +2,7 @@ export default interface Test {
   description: string;
   fn: TestFunction;
   runState: TestRunState;
+  skipReason?: string;
 }
 
 export enum TestRunState {
@@ -22,6 +23,8 @@ export interface TestFunctionArg {
 
 export type TestResultState = "Pass" | "Fail" | "Error" | "Skip" | "Todo";
 
-export type TestResultStateAndMessage = [TestResultState, string?];
-
-export type TestResults = Record<string, TestResultStateAndMessage>;
+export interface TestResult {
+  description: string;
+  resultState: TestResultState;
+  resultMessage?: string;
+}

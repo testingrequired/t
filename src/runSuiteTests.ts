@@ -1,43 +1,58 @@
 import assert, { AssertionError } from "assert";
 import Suite from "./Suite";
-import { TestResultStateAndMessage, TestResults } from "./Test";
+import { TestResult } from "./Test";
 import createSpy from "./spy";
 
-export default function runSuiteTests(suite: Suite): TestResults {
-  const testResults: TestResults = suite.tests.reduce(
-    (results, { description, fn, runState: state }) => {
-      let result: TestResultStateAndMessage;
+export default function runSuiteTests(suite: Suite): Array<TestResult> {
+  return suite.tests.reduce((results: Array<TestResult>, test) => {
+    const { description, fn, runState } = test;
 
-      switch (state) {
-        case "Skip":
-          result = ["Skip"];
-          break;
-        case "Todo":
-          result = ["Todo"];
-          break;
-        default:
-          try {
-            suite.beforeEachs.forEach(fn => fn());
-
-            fn({
-              assert,
-              assertEqual: assert.strictEqual,
-              spy: createSpy
-            });
-
-            result = ["Pass"];
-          } catch (e) {
-            result = [
-              e instanceof AssertionError ? "Fail" : "Error",
-              e.message
-            ];
+    switch (runState) {
+      case "Skip":
+        return [
+          ...results,
+          {
+            description: description,
+            resultState: "Skip"
           }
-      }
+        ];
 
-      return { ...results, [description]: result };
-    },
-    {}
-  );
+      case "Todo":
+        return [
+          ...results,
+          {
+            description: description,
+            resultState: "Todo"
+          }
+        ];
 
-  return testResults;
+      default:
+        try {
+          suite.beforeEachs.forEach(fn => fn());
+
+          fn({
+            assert,
+            assertEqual: assert.strictEqual,
+            spy: createSpy
+          });
+
+          return [
+            ...results,
+            {
+              description: description,
+              resultState: "Pass"
+            }
+          ];
+        } catch (e) {
+          return [
+            ...results,
+            {
+              description: description,
+              resultState: e instanceof AssertionError ? "Fail" : "Error",
+              resultMessage: e.message
+            }
+          ];
+        }
+    }
+  }, []);
 }

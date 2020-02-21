@@ -6,6 +6,7 @@ import Suite from "./Suite";
 import TrcFile from "./TrcFile";
 import runSuiteTests from "./runSuiteTests";
 import getTrcFile from "./getTrcConfig";
+import { TestResult } from "./Test";
 
 isMainThread ? mainThread() : debugThread();
 
@@ -36,7 +37,7 @@ async function mainThread() {
     process.exit(1);
   }
 
-  const results = await Promise.all(
+  const results = await Promise.all<Array<TestResult>>(
     testFilePaths.map(
       testFilePath =>
         new Promise((resolve, reject) => {
@@ -55,12 +56,20 @@ async function mainThread() {
     )
   );
 
-  const resultsFormatted = results.reduce(
+  const resultsFormatted = results.reduce<Record<string, Array<TestResult>>>(
     (acc: object, item, i) => ({ ...acc, [testFilePaths[i]]: item }),
     {}
   );
 
-  console.log(resultsFormatted);
+  testFilePaths.forEach(testFilePath => {
+    console.log(testFilePath);
+
+    const testFileResults = resultsFormatted[testFilePath].map(
+      x => `${x.resultState}: ${x.description}`
+    );
+
+    console.log(testFileResults);
+  });
 }
 
 function debugThread() {
