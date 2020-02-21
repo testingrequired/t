@@ -2,7 +2,7 @@
   "name": "@testingrequired/t",
   "version": "0.0.0",
   "description": "A minimal test framework",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
     "type-check": "tsc --noEmit",
     "type-check:watch": "npm run type-check -- --watch",
