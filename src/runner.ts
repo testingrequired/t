@@ -59,7 +59,7 @@ if (isMainThread) {
 
   const testResults = runSuiteTests(suite);
 
-  parentPort?.postMessage(JSON.stringify(testResults));
+  parentPort?.postMessage(testResults);
 }
 
 async function getPattern(trcConfig: Config) {
@@ -73,9 +73,9 @@ function mapTestFilePathToWorker(testFilePath: string) {
       workerData: testFilePath
     });
 
-    worker.on("message", message => resolve(JSON.parse(message)));
+    worker.on("message", resolve);
 
-    worker.on("error", error => reject(error));
+    worker.on("error", reject);
 
     worker.on("exit", code =>
       reject(`This shouldn't happen: ${testFilePath} exited with ${code}`)
