@@ -20,6 +20,11 @@ if (isMainThread) {
 
     const testFilePaths = await promisify(glob)(pattern);
 
+    if (testFilePaths.length === 0) {
+      console.log(`Test file pattern ${pattern} returned no test files`);
+      process.exit(1);
+    }
+
     const results = await Promise.all(
       testFilePaths.map(testFilePath => {
         return new Promise((resolve, reject) => {
