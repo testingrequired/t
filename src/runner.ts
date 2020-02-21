@@ -19,7 +19,8 @@ async function mainThread() {
     process.exit(1);
   }
 
-  const pattern = await getPattern(trcFile);
+  const [patternFromArgs] = process.argv.slice(2);
+  const pattern = patternFromArgs ?? trcFile.pattern;
 
   if (!pattern) {
     console.log(
@@ -35,7 +36,24 @@ async function mainThread() {
     process.exit(1);
   }
 
-  const results = await Promise.all(testFilePaths.map(mapTestFilePathToWorker));
+  const results = await Promise.all(
+    testFilePaths.map(
+      testFilePath =>
+        new Promise((resolve, reject) => {
+          const worker = new Worker(__filename, {
+            workerData: testFilePath
+          });
+
+          worker.on("message", resolve);
+
+          worker.on("error", reject);
+
+          worker.on("exit", code =>
+            reject(`This shouldn't happen: ${testFilePath} exited with ${code}`)
+          );
+        })
+    )
+  );
 
   const resultsFormatted = results.reduce(
     (acc: object, item, i) => ({ ...acc, [testFilePaths[i]]: item }),
@@ -59,25 +77,4 @@ function debugThread() {
   const testResults = runSuiteTests(suite);
 
   parentPort?.postMessage(testResults);
-}
-
-async function getPattern(trcConfig: TrcFile) {
-  const [patternFromArgs] = process.argv.slice(2);
-  return patternFromArgs ?? trcConfig.pattern;
-}
-
-function mapTestFilePathToWorker(testFilePath: string) {
-  return new Promise((resolve, reject) => {
-    const worker = new Worker(__filename, {
-      workerData: testFilePath
-    });
-
-    worker.on("message", resolve);
-
-    worker.on("error", reject);
-
-    worker.on("exit", code =>
-      reject(`This shouldn't happen: ${testFilePath} exited with ${code}`)
-    );
-  });
 }
