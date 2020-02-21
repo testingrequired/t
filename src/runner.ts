@@ -40,11 +40,12 @@ if (isMainThread) {
       testFilePaths.map(mapTestFilePathToWorker)
     );
 
-    console.log(
-      results.reduce((acc: object, item, i) => {
-        return { ...acc, [testFilePaths[i]]: item };
-      }, {})
+    const resultsFormatted = results.reduce(
+      (acc: object, item, i) => ({ ...acc, [testFilePaths[i]]: item }),
+      {}
     );
+
+    console.log(resultsFormatted);
   })();
 } else {
   const suiteModule: any = require(path.join(process.cwd(), workerData));
