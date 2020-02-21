@@ -8,8 +8,19 @@ import runSuiteTests from "./runSuiteTests";
 import getTrcConfig from "./getTrcConfig";
 
 if (isMainThread) {
+  const trcPath = path.join(process.cwd(), ".trc");
+
   (async () => {
-    const pattern = await getPattern();
+    let trcConfig: Config;
+
+    try {
+      trcConfig = await getTrcConfig(trcPath);
+    } catch (e) {
+      console.log(`Error occurred reading .trc file: ${e.message}`);
+      process.exit(1);
+    }
+
+    const pattern = await getPattern(trcConfig);
 
     if (!pattern) {
       console.log(
@@ -26,21 +37,7 @@ if (isMainThread) {
     }
 
     const results = await Promise.all(
-      testFilePaths.map(testFilePath => {
-        return new Promise((resolve, reject) => {
-          const worker = new Worker(__filename, {
-            workerData: testFilePath
-          });
-
-          worker.on("message", message => resolve(JSON.parse(message)));
-
-          worker.on("error", error => reject(error));
-
-          worker.on("exit", code =>
-            reject(`This shouldn't happen: ${testFilePath} exited with ${code}`)
-          );
-        });
-      })
+      testFilePaths.map(mapTestFilePathToWorker)
     );
 
     console.log(
@@ -65,18 +62,23 @@ if (isMainThread) {
   parentPort?.postMessage(JSON.stringify(testResults));
 }
 
-async function getPattern() {
+async function getPattern(trcConfig: Config) {
   const [patternFromArgs] = process.argv.slice(2);
-
-  let trcConfig: Config;
-
-  try {
-    const trcPath = path.join(process.cwd(), ".trc");
-    trcConfig = await getTrcConfig(trcPath);
-  } catch (e) {
-    console.log(`Error occurred reading .trc file: ${e.message}`);
-    process.exit(1);
-  }
-
   return patternFromArgs ?? trcConfig.pattern;
+}
+
+function mapTestFilePathToWorker(testFilePath: string) {
+  return new Promise((resolve, reject) => {
+    const worker = new Worker(__filename, {
+      workerData: testFilePath
+    });
+
+    worker.on("message", message => resolve(JSON.parse(message)));
+
+    worker.on("error", error => reject(error));
+
+    worker.on("exit", code =>
+      reject(`This shouldn't happen: ${testFilePath} exited with ${code}`)
+    );
+  });
 }
