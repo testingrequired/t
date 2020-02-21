@@ -20,4 +20,8 @@ export interface TestFunctionArg {
   spy: () => Function;
 }
 
-export type TestResult = "Pass" | "Fail" | "Error" | "Skip" | "Todo";
+export type TestResultState = "Pass" | "Fail" | "Error" | "Skip" | "Todo";
+
+export type TestResultStateAndMessage = [TestResultState, string?];
+
+export type TestResult = Record<string, TestResultStateAndMessage>;

@@ -1,52 +1,43 @@
 import assert, { AssertionError } from "assert";
 import Suite from "./Suite";
-import { TestResult, TestFunctionArg, TestFunction } from "./Test";
+import { TestResultStateAndMessage, TestResult } from "./Test";
 import createSpy from "./spy";
 
-export default function runSuiteTests(
-  suite: Suite
-): Record<string, [TestResult, string?]> {
-  const testResults: Record<string, [TestResult, string?]> = suite.tests.reduce(
+export default function runSuiteTests(suite: Suite): TestResult {
+  const testResults: TestResult = suite.tests.reduce(
     (results, { description, fn, state }) => {
-      let result;
+      let result: TestResultStateAndMessage;
 
       switch (state) {
         case "Skip":
-          result = { [description]: ["Skip"] };
+          result = ["Skip"];
           break;
         case "Todo":
-          result = { [description]: ["Todo"] };
+          result = ["Todo"];
           break;
         default:
-          result = { [description]: suiteTest(suite, fn) };
+          try {
+            suite.beforeEachs.forEach(fn => fn());
+
+            fn({
+              assert,
+              assertEqual: assert.strictEqual,
+              spy: createSpy
+            });
+
+            result = ["Pass"];
+          } catch (e) {
+            result = [
+              e instanceof AssertionError ? "Fail" : "Error",
+              e.message
+            ];
+          }
       }
 
-      return { ...results, ...result };
+      return { ...results, [description]: result };
     },
     {}
   );
 
-  function suiteTest(suite: Suite, fn: TestFunction) {
-    try {
-      suite.beforeEachs.forEach(fn => fn());
-
-      const fnArg: TestFunctionArg = {
-        assert,
-        assertEqual: assert.strictEqual,
-        spy: createSpy
-      };
-
-      fn(fnArg);
-
-      return ["Pass"];
-    } catch (e) {
-      return [mapErrorToTestResult(e), e.message];
-    }
-  }
-
   return testResults;
-}
-
-function mapErrorToTestResult(e: Error): TestResult {
-  return e instanceof AssertionError ? "Fail" : "Error";
 }
