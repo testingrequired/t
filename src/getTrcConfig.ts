@@ -1,8 +1,8 @@
 import fs from "fs";
 import { promisify } from "util";
-import Config from "./Config";
+import TrcFile from "./TrcFile";
 
-export default async function getTrcConfig(trcPath: string): Promise<Config> {
+export default async function getTrcConfig(trcPath: string): Promise<TrcFile> {
   if (!(await promisify(fs.exists)(trcPath))) return {};
 
   return JSON.parse(
