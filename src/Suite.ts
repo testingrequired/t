@@ -63,8 +63,13 @@ export default class Suite {
     return this;
   }
 
-  skip(description: string, fn: TestFunction): this {
-    this.tests.push({ description, fn, runState: TestRunState.Skip });
+  skip(description: string, fn: TestFunction, skipReason?: string): this {
+    this.tests.push({
+      description,
+      fn,
+      runState: TestRunState.Skip,
+      skipReason
+    });
     return this;
   }
 

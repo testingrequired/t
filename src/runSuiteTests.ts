@@ -5,7 +5,7 @@ import createSpy from "./spy";
 
 export default function runSuiteTests(suite: Suite): Array<TestResult> {
   return suite.tests.reduce((results: Array<TestResult>, test) => {
-    const { description, fn, runState } = test;
+    const { description, fn, runState, skipReason } = test;
 
     switch (runState) {
       case "Skip":
@@ -13,7 +13,8 @@ export default function runSuiteTests(suite: Suite): Array<TestResult> {
           ...results,
           {
             description: description,
-            resultState: "Skip"
+            resultState: "Skip",
+            resultMessage: skipReason
           }
         ];
 

@@ -6,11 +6,15 @@ import Suite from "./Suite";
 import TrcFile from "./TrcFile";
 import runSuiteTests from "./runSuiteTests";
 import getTrcFile from "./getTrcConfig";
-import { TestResult } from "./Test";
+import { TestResult, TestResultState } from "./Test";
+const pkg = require("../package.json");
 
 isMainThread ? mainThread() : debugThread();
 
 async function mainThread() {
+  console.log(`t ${pkg.version}`);
+  console.log();
+
   let trcFile: TrcFile;
 
   try {
@@ -64,12 +68,27 @@ async function mainThread() {
   testFilePaths.forEach(testFilePath => {
     console.log(testFilePath);
 
-    const testFileResults = resultsFormatted[testFilePath].map(
-      x => `${x.resultState}: ${x.description}`
-    );
+    const testFileResults = resultsFormatted[testFilePath];
 
-    console.log(testFileResults);
+    console.log(testFileResults.map(formatTestResult).join("\n"));
+    console.log();
   });
+
+  const allTestFileResults = Object.values(resultsFormatted).flat();
+
+  const total = allTestFileResults.length;
+  const passed = allTestFileResults.filter(x => x.resultState === "Pass")
+    .length;
+  const failed = allTestFileResults.filter(x => x.resultState === "Fail")
+    .length;
+  const errored = allTestFileResults.filter(x => x.resultState === "Error")
+    .length;
+  const skipped = allTestFileResults.filter(x => x.resultState === "Skip")
+    .length;
+  const todod = allTestFileResults.filter(x => x.resultState === "Todo").length;
+
+  console.log("Counts");
+  console.log({ total, passed, failed, errored, skipped, todod });
 }
 
 function debugThread() {
@@ -86,4 +105,20 @@ function debugThread() {
   const testResults = runSuiteTests(suite);
 
   parentPort?.postMessage(testResults);
+}
+
+function formatTestResult(testResult: TestResult) {
+  const { resultState, resultMessage, description } = testResult;
+
+  const glyphs: Record<TestResultState, string> = {
+    Error: "@",
+    Fail: "!",
+    Todo: "*",
+    Skip: "^",
+    Pass: "."
+  };
+
+  return `${glyphs[resultState]} ${description}: ${resultState}${
+    resultMessage ? `\n  ${resultMessage}` : ""
+  }`;
 }
