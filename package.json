@@ -26,12 +26,16 @@
     "@types/chalk": "^2.2.0",
     "@types/glob": "^7.1.1",
     "@types/node": "^13.7.1",
+    "@types/react": "^16.9.23",
     "esm": "^3.2.25",
     "typescript": "^3.8.2"
   },
   "dependencies": {
+    "@babel/preset-react": "^7.8.3",
     "@babel/runtime": "^7.8.4",
     "chalk": "^3.0.0",
-    "glob": "^7.1.6"
+    "glob": "^7.1.6",
+    "ink": "^2.7.1",
+    "react": "^16.13.0"
   }
 }
