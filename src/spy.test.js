@@ -5,8 +5,6 @@ export default suite(({ test }) => {
   test("spy works", _ => {
     const s = createSpy();
 
-    throw Error("What??");
-
     s("foo");
 
     _.assertEqual(1, s.calls.length);
