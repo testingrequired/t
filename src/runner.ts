@@ -123,8 +123,20 @@ function debugThread() {
 }
 
 function formatTestResult(testResult: TestResult) {
-  const { resultState, resultMessage, description } = testResult;
+  const { description } = testResult;
 
+  const glyph = mapTestResultStateToGlyph(testResult.resultState);
+  const resultState = mapTestResultStateToColor(testResult.resultState)(
+    testResult.resultState
+  );
+  const resultMessage = testResult.resultMessage
+    ? `\n  ${testResult.resultMessage}`
+    : "";
+
+  return `${glyph} ${description}: ${resultState}${resultMessage}`;
+}
+
+function mapTestResultStateToGlyph(state: TestResultState): string {
   const glyphs: Record<TestResultState, string> = {
     Error: "@",
     Fail: "!",
@@ -133,6 +145,14 @@ function formatTestResult(testResult: TestResult) {
     Pass: "."
   };
 
+  if (!Object.keys(glyphs).includes(state)) {
+    throw new Error();
+  }
+
+  return glyphs[state];
+}
+
+function mapTestResultStateToColor(state: TestResultState) {
   const colors: Record<TestResultState, any> = {
     Error: chalk.red,
     Fail: chalk.red,
@@ -141,7 +161,9 @@ function formatTestResult(testResult: TestResult) {
     Pass: chalk.green
   };
 
-  return `${glyphs[resultState]} ${description}: ${colors[resultState](
-    resultState
-  )}${resultMessage ? `\n  ${resultMessage}` : ""}`;
+  if (!Object.keys(colors).includes(state)) {
+    throw new Error();
+  }
+
+  return colors[state];
 }
