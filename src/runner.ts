@@ -8,11 +8,12 @@ import runSuiteTests from "./runSuiteTests";
 import getTrcFile from "./getTrcConfig";
 import { TestResult, TestResultState } from "./Test";
 const pkg = require("../package.json");
+const chalk = require("chalk");
 
 isMainThread ? mainThread() : debugThread();
 
 async function mainThread() {
-  console.log(`t ${pkg.version}`);
+  console.log(`${chalk.bold("t")} ${pkg.version}`);
   console.log();
 
   let trcFile: TrcFile;
@@ -29,7 +30,11 @@ async function mainThread() {
 
   if (!pattern) {
     console.log(
-      `Test file pattern could not be determined from a .trc file or from runner args`
+      chalk.red(
+        `${chalk.bold(
+          "Error:"
+        )} Test file pattern could not be determined from a .trc file or from runner args`
+      )
     );
     process.exit(1);
   }
@@ -66,7 +71,7 @@ async function mainThread() {
   );
 
   testFilePaths.forEach(testFilePath => {
-    console.log(testFilePath);
+    console.log(chalk.underline(testFilePath));
 
     const testFileResults = resultsFormatted[testFilePath];
 
@@ -88,7 +93,17 @@ async function mainThread() {
   const todod = allTestFileResults.filter(x => x.resultState === "Todo").length;
 
   console.log("Counts");
-  console.log({ total, passed, failed, errored, skipped, todod });
+
+  const tableData = Object.entries({
+    total,
+    passed,
+    failed,
+    errored,
+    skipped,
+    todod
+  }).map(([type, count]) => ({ type, count }));
+
+  console.table(tableData);
 }
 
 function debugThread() {
@@ -114,11 +129,19 @@ function formatTestResult(testResult: TestResult) {
     Error: "@",
     Fail: "!",
     Todo: "*",
-    Skip: "^",
+    Skip: ">",
     Pass: "."
   };
 
-  return `${glyphs[resultState]} ${description}: ${resultState}${
-    resultMessage ? `\n  ${resultMessage}` : ""
-  }`;
+  const colors: Record<TestResultState, any> = {
+    Error: chalk.red,
+    Fail: chalk.red,
+    Todo: chalk.yellow,
+    Skip: chalk.yellow,
+    Pass: chalk.green
+  };
+
+  return `${glyphs[resultState]} ${description}: ${colors[resultState](
+    resultState
+  )}${resultMessage ? `\n  ${resultMessage}` : ""}`;
 }
